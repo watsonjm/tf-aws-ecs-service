@@ -263,6 +263,10 @@ resource "aws_lb_target_group" "this" {
     matcher             = var.health_check_http_response
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-ecs-tg" })
 }
 
