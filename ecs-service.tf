@@ -2,7 +2,6 @@
 # Locals & Data
 #####################
 locals {
-  ecs_svc_name          = "${var.tag_prefix}-${var.svc_name}"
   execution_role        = var.execution_role_arn == null ? aws_iam_role.this.arn : var.execution_role_arn
   task_role             = var.task_role_arn == null ? aws_iam_role.this.arn : var.task_role_arn
   discovery_svc_name    = var.discovery_svc_name == null ? var.svc_name : var.discovery_svc_name
@@ -37,7 +36,7 @@ resource "aws_ecs_task_definition" "this" {
   cpu                      = var.task_cpu
   container_definitions    = var.container_def
 
-  tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-task" })
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-task-def" })
 }
 
 #####################
@@ -80,7 +79,7 @@ resource "aws_ecs_service" "this" {
   dynamic "load_balancer" {
     for_each = var.enable_alb ? ["alb"] : []
     content {
-      container_name   = local.ecs_svc_name
+      container_name   = var.svc_name
       container_port   = 80
       target_group_arn = aws_lb_target_group.this[0].arn
     }
@@ -90,7 +89,7 @@ resource "aws_ecs_service" "this" {
     ignore_changes = [task_definition]
   }
 
-  tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-service" })
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-service" })
 }
 
 
@@ -115,7 +114,7 @@ resource "aws_service_discovery_service" "this" {
     failure_threshold = 1
   }
 
-  tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-service-discovery" })
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-service-discovery" })
 }
 
 #####################
@@ -164,7 +163,7 @@ resource "aws_appautoscaling_target" "this" {
 
 resource "aws_appautoscaling_policy" "this" {
   count              = var.enable_autoscaling ? 1 : 0
-  name               = "${local.ecs_svc_name}-autoscaling-policy"
+  name               = "${var.svc_name}-autoscaling-policy"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id
   scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
@@ -187,7 +186,7 @@ resource "aws_appautoscaling_policy" "this" {
 #####################
 resource "aws_lb" "this" {
   count                      = var.enable_alb ? 1 : 0
-  name                       = "${local.ecs_svc_name}-ecs-alb"
+  name                       = "${var.svc_name}-ecs-alb"
   subnets                    = var.subnet_ids
   security_groups            = local.ecs_svc_sg
   internal                   = var.internal_alb
@@ -195,7 +194,7 @@ resource "aws_lb" "this" {
   load_balancer_type         = "application"
   enable_deletion_protection = false
 
-  tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-ecs-alb" })
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-ecs-alb" })
 }
 
 resource "aws_lb_listener" "http_forward" {
@@ -267,7 +266,7 @@ resource "aws_lb_target_group" "this" {
     create_before_destroy = true
   }
 
-  tags = merge(var.common_tags, { Name = "${local.ecs_svc_name}-ecs-tg" })
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-ecs-tg" })
 }
 
 #####################
