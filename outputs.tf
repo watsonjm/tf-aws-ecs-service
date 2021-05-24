@@ -8,3 +8,6 @@ output "ecs_service" {
 output "ecs_task_definition" {
   value = aws_ecs_task_definition.this
 }
+output "lb_dns_name" {
+  value = var.enable_alb ? aws_lb.this[0].dns_name : "No load balancer has been created."
+}
