@@ -3,7 +3,7 @@ Creates all of the resources needed for an ECS service.
 
 if you need custom role policies, attach them outside of the module like this:
 resource "aws_iam_role_policy_attachment" "ecs_kms" {
-  role = module.ecs_middleware.ecs_task_definition.task_role_arn
+  role = module.ecs_middleware.task_role_name
   policy_arn = aws_iam_policy.ecs_kms.arn
 }
 
