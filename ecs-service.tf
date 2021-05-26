@@ -143,7 +143,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each   = var.iam_policies == null ? toset(local.ecs_min_roles) : toset(concat(local.ecs_min_roles, var.iam_policies))
+  for_each   = var.aws_managed_iam_policies == null ? toset(local.ecs_min_roles) : toset(concat(local.ecs_min_roles, var.aws_managed_iam_policies))
   role       = aws_iam_role.this.name
   policy_arn = each.value
 }

@@ -27,19 +27,21 @@ variable "task_cpu" {
   default = 256
 }
 variable "container_def" {
-
+  description = "Container definition part of task definition."
 }
 variable "execution_role_arn" {
   default     = null
   description = "task definition will use default role created by module unless one is passed in"
 }
 variable "task_role_arn" {
+  type        = string
   default     = null
   description = "task definition will use default role created by module unless one is passed in"
 }
-variable "iam_policies" {
-  type    = list(string)
-  default = null
+variable "aws_managed_iam_policies" {
+  type        = list(string)
+  default     = null
+  description = "Only use if you're passing in AWS managed policies, otherwise pass in your own task role arn using var.task_role_arn."
 }
 variable "reqd_compatibilities" {
   type    = list(string)
