@@ -10,3 +10,6 @@ output "ecs_task_definition" {
 output "lb" {
   value = var.enable_alb ? aws_lb.this : null
 }
+output "task_role_name" {
+  value = aws_iam_role.this.name
+}
