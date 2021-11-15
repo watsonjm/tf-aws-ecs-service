@@ -8,6 +8,9 @@ locals {
   ecs_svc_sg            = var.security_groups == null ? [data.aws_security_group.default.id] : var.security_groups
   ecs_min_roles         = ["arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
   acm_wildcard_cert_arn = var.enable_alb && var.forward_alb_http_to_https ? var.ssl_cert_arn : null
+  latest_revision = "${aws_ecs_task_definition.this.family}:${max(aws_ecs_task_definition.this.revision, data.aws_ecs_task_definition.latest.revision)}"
+  specific_revision = "${aws_ecs_task_definition.this.family}:${var.task_definition_revision}"
+  task_definition = upper(var.task_definition_revision) == "LATEST" ? local.latest_revision : local.specific_revision
 }
 data "aws_security_group" "default" {
   vpc_id = var.vpc_id
@@ -22,6 +25,9 @@ data "aws_iam_role" "awsmanaged" {
 data "aws_route53_zone" "zone" {
   count = var.enable_alb ? 1 : 0
   name  = var.route53_zone
+}
+data "aws_ecs_task_definition" "latest" {
+  task_definition = aws_ecs_task_definition.this.family
 }
 #####################
 # Task Definition
@@ -48,7 +54,7 @@ resource "aws_ecs_service" "this" {
   ]
   name                               = var.svc_name
   cluster                            = data.aws_ecs_cluster.cluster.id
-  task_definition                    = aws_ecs_task_definition.this.arn
+  task_definition                    = local.task_definition
   deployment_maximum_percent         = var.svc_max_percent
   deployment_minimum_healthy_percent = var.svc_min_percent
   desired_count                      = var.desired_count
