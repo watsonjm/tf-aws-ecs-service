@@ -181,3 +181,8 @@ variable "alb_dns_subdomain" {
   default     = null
   description = "Subdomain used on load balancer Route53 entry"
 }
+variable "task_definition_revision" {
+  type = string
+  default = "Latest"
+  description = "Set to the numbered revision if you don't want to use the latest revision. This must be put in as either the word latest or a valid numbered revision."
+}
