@@ -13,3 +13,6 @@ output "lb" {
 output "task_role_name" {
   value = aws_iam_role.this.name
 }
+output "task_definition_in_use" {
+  value = local.task_definition
+}
