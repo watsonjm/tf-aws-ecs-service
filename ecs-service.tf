@@ -91,9 +91,9 @@ resource "aws_ecs_service" "this" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [task_definition]
-  }
+  # lifecycle {
+  #   ignore_changes = [task_definition]
+  # }
 
   tags = merge(var.common_tags, { Name = "${var.svc_name}-service" })
 }
