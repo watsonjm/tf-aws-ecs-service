@@ -182,7 +182,12 @@ variable "alb_dns_subdomain" {
   description = "Subdomain used on load balancer Route53 entry"
 }
 variable "task_definition_revision" {
-  type = string
-  default = "Latest"
+  type        = string
+  default     = "Latest"
   description = "Set to the numbered revision if you don't want to use the latest revision. This must be put in as either the word latest or a valid numbered revision."
+}
+variable "enable_cw_logging" {
+  type        = bool
+  default     = true
+  description = "Enable this ECS service to send logs to CloudWatch."
 }
