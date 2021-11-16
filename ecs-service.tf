@@ -156,7 +156,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 
 resource "aws_iam_policy" "ecs_cw" {
   count       = var.enable_cw_logging ? 1 : 0
-  name        = "${var.tag_prefix}-ecs-cw-logs"
+  name_prefix = "${var.tag_prefix}-ecs-cw-logs"
   path        = "/"
   description = "allows ECS logging to CloudWatch."
 
