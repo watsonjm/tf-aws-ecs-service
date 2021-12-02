@@ -6,7 +6,7 @@ locals {
   task_role             = var.task_role_arn == null ? aws_iam_role.this.arn : var.task_role_arn
   discovery_svc_name    = var.discovery_svc_name == null ? var.svc_name : var.discovery_svc_name
   ecs_svc_sg            = var.security_groups == null ? [data.aws_security_group.default.id] : var.security_groups
-  ecs_min_roles         = ["arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
+  ecs_min_roles         = ["arn:${var.aws_partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
   acm_wildcard_cert_arn = var.enable_alb && var.forward_alb_http_to_https ? var.ssl_cert_arn : null
   latest_revision       = "${aws_ecs_task_definition.this.family}:${max(aws_ecs_task_definition.this.revision, data.aws_ecs_task_definition.latest.revision)}"
   specific_revision     = "${aws_ecs_task_definition.this.family}:${var.task_definition_revision}"
@@ -29,7 +29,6 @@ data "aws_route53_zone" "zone" {
 data "aws_ecs_task_definition" "latest" {
   task_definition = aws_ecs_task_definition.this.family
 }
-data "aws_partition" "current" {}
 #####################
 # Task Definition
 #####################

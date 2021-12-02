@@ -191,3 +191,8 @@ variable "enable_cw_logging" {
   default     = true
   description = "Enable this ECS service to send logs to CloudWatch."
 }
+variable "aws_partition" {
+  type        = string
+  default     = "aws"
+  description = "AWS partition is used for govcloud. This is not done in a data lookup because that will cause terraform plan for this module to fail."
+}
