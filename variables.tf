@@ -186,11 +186,11 @@ variable "task_definition_revision" {
   default     = "Latest"
   description = "Set to the numbered revision if you don't want to use the latest revision. This must be put in as either the word latest or a valid numbered revision."
 }
-variable "enable_cw_logging" {
-  type        = bool
-  default     = true
-  description = "Enable this ECS service to send logs to CloudWatch."
-}
+# variable "enable_cw_logging" {
+#   type        = bool
+#   default     = true
+#   description = "Enable this ECS service to send logs to CloudWatch."
+# }
 variable "aws_partition" {
   type        = string
   default     = "aws"

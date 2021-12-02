@@ -154,36 +154,36 @@ resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = each.value
 }
 
-resource "aws_iam_policy" "ecs_cw" {
-  count       = var.enable_cw_logging ? 1 : 0
-  name_prefix = "${var.tag_prefix}-ecs-cw-logs"
-  path        = "/"
-  description = "allows ECS logging to CloudWatch."
+# resource "aws_iam_policy" "ecs_cw" { # This should be covered by the minimum required policy
+#   count       = var.enable_cw_logging ? 1 : 0
+#   name_prefix = "${var.tag_prefix}-ecs-cw-logs"
+#   path        = "/"
+#   description = "allows ECS logging to CloudWatch."
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:DescribeLogStreams"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": [
+#                 "logs:CreateLogGroup",
+#                 "logs:CreateLogStream",
+#                 "logs:PutLogEvents",
+#                 "logs:DescribeLogStreams"
+#             ],
+#             "Resource": "*"
+#         }
+#     ]
+# }
+# EOF
+# }
 
-resource "aws_iam_role_policy_attachment" "cw_logging" {
-  count      = var.enable_cw_logging ? 1 : 0
-  role       = aws_iam_role.this.name
-  policy_arn = aws_iam_policy.ecs_cw.0.arn
-}
+# resource "aws_iam_role_policy_attachment" "cw_logging" {
+#   count      = var.enable_cw_logging ? 1 : 0
+#   role       = aws_iam_role.this.name
+#   policy_arn = aws_iam_policy.ecs_cw.0.arn
+# }
 
 #####################
 # AUTOSCALING
