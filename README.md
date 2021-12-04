@@ -41,3 +41,6 @@ resource "aws_iam_policy" "ecs_kms" {
 EOF
 }
 ```
+
+
+If you need to attach policies outside of the module, use the "aws_iam_role_policy_attachment" resource and attach to either module.<module name>.task_role_name or module.<module name>.task_execution_role_name

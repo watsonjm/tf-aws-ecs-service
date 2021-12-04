@@ -41,7 +41,7 @@ variable "task_role_arn" {
 variable "aws_managed_iam_policies" {
   type        = list(string)
   default     = null
-  description = "Only use if you're passing in AWS managed policies, otherwise pass in your own task role arn using var.task_role_arn."
+  description = "Only use if you're passing in AWS managed policies for the task execution role."
 }
 variable "reqd_compatibilities" {
   type    = list(string)

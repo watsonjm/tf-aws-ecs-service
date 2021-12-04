@@ -2,8 +2,8 @@
 # Locals & Data
 #####################
 locals {
-  execution_role        = var.execution_role_arn == null ? aws_iam_role.this.arn : var.execution_role_arn
-  task_role             = var.task_role_arn == null ? aws_iam_role.this.arn : var.task_role_arn
+  execution_role        = var.execution_role_arn == null ? aws_iam_role.task_execution_role.arn : var.execution_role_arn
+  task_role             = var.task_role_arn == null ? aws_iam_role.task_role.arn : var.task_role_arn
   discovery_svc_name    = var.discovery_svc_name == null ? var.svc_name : var.discovery_svc_name
   ecs_svc_sg            = var.security_groups == null ? [data.aws_security_group.default.id] : var.security_groups
   ecs_min_roles         = ["arn:${var.aws_partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
@@ -126,8 +126,8 @@ resource "aws_service_discovery_service" "this" {
 #####################
 # IAM
 #####################
-resource "aws_iam_role" "this" {
-  name_prefix = "${var.tag_prefix}-ecs-role-"
+resource "aws_iam_role" "task_execution_role" {
+  name_prefix = "${var.tag_prefix}-ecs-exec-"
 
   assume_role_policy = <<EOF
 {
@@ -145,12 +145,34 @@ resource "aws_iam_role" "this" {
 }
 EOF
 
-  tags = merge(var.common_tags, { Name = "${var.tag_prefix}-ecs-role" })
+  tags = merge(var.common_tags, { Name = "${var.tag_prefix}-ecs-execution-role" })
+}
+
+resource "aws_iam_role" "task_role" {
+  name_prefix = "${var.tag_prefix}-ecs-task"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+
+  tags = merge(var.common_tags, { Name = "${var.tag_prefix}-ecs-task-role" })
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
   for_each   = var.aws_managed_iam_policies == null ? toset(local.ecs_min_roles) : toset(concat(local.ecs_min_roles, var.aws_managed_iam_policies))
-  role       = aws_iam_role.this.name
+  role       = aws_iam_role.task_execution_role.name
   policy_arn = each.value
 }
 
@@ -181,7 +203,7 @@ resource "aws_iam_role_policy_attachment" "this" {
 
 # resource "aws_iam_role_policy_attachment" "cw_logging" {
 #   count      = var.enable_cw_logging ? 1 : 0
-#   role       = aws_iam_role.this.name
+#   role       = aws_iam_role.task_execution_role.name
 #   policy_arn = aws_iam_policy.ecs_cw.0.arn
 # }
 
@@ -252,6 +274,8 @@ resource "aws_lb_listener" "http_forward" {
       status_code = "HTTP_301"
     }
   }
+
+  tags = merge(var.common_tags, { Name = "${var.svc_name}-ecs-alb-listener" })
 }
 
 resource "aws_lb_listener" "http" {
