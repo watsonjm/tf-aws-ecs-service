@@ -8,7 +8,9 @@ variable "tag_prefix" {
   description = "'Name' tag prefix, used for resource naming."
 }
 variable "common_tags" {
-
+  type        = map(any)
+  default     = null
+  description = "map of tags"
 }
 variable "network_mode" {
   type    = string
