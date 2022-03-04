@@ -19,3 +19,6 @@ output "task_execution_role_name" {
 output "task_definition_in_use" {
   value = local.task_definition
 }
+output "route53_record" {
+  value = var.enable_alb ? aws_route53_record.this[0] : null
+}
